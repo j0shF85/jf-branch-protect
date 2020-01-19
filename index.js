@@ -5,14 +5,8 @@
 module.exports = app => {
   // Your code here
   app.log('Yay, the app was loaded!')
-  /*
-  app.on('issues.opened', async context => {
-    const issueComment = context.issue({ body: 'Thanks for opening this issue!' })
-    return context.github.issues.createComment(issueComment)
-  })
-  */
-
-  // protect master branch when repo get created
+  
+  // Run when a repo is created
   app.on('repository.created', async context => {
     // protect master branch
     const createBranchProtectionRule = `
@@ -27,6 +21,21 @@ module.exports = app => {
       pattern: "master",
       requiresApprovingReviews: true,
       requiredApprovingReviewCount: 2
+    })
+    
+    // create issue for branch protection details
+    const sender = context.payload.sender.login
+    const createIssue = `
+      mutation issue($id: ID!, $title: String!, $body: String!) {
+        createIssue(input: {repositoryId: $id, title: $title, body: $body}) {
+          clientMutationId
+        }
+      }
+    `
+    context.github.graphql(createIssue, {
+      id: context.payload.repository.node_id,
+      title: "Branch protection rules applied",
+      body: `@${sender} Pull request required when merging to master; at least 2 approvals are required`
     })
   })
 
