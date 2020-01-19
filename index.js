@@ -30,6 +30,24 @@ module.exports = app => {
     })
   })
 
+  // create issue when branch rules created
+  app.on('repository.created', async context => {
+    // protect master branch
+    const createBranchProtectionRule = `
+      mutation repository($id: ID!, $pattern: String!, $requiresApprovingReviews: Boolean!, $requiredApprovingReviewCount: Int!) {
+        createBranchProtectionRule(input: {repositoryId: $id, pattern: $pattern, requiresApprovingReviews: $requiresApprovingReviews, requiredApprovingReviewCount: $requiredApprovingReviewCount}) {
+          clientMutationId
+        }
+      }
+    `
+    context.github.graphql(createBranchProtectionRule, {
+      id: context.payload.repository.node_id,
+      pattern: "master",
+      requiresApprovingReviews: true,
+      requiredApprovingReviewCount: 2
+    })
+  })
+
   // For more information on building apps:
   // https://probot.github.io/docs/
 
