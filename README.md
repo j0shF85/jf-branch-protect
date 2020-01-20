@@ -13,10 +13,14 @@ Once installed in your [GitHub Organisation]
 This GitHub App can be deployed on your local computer as a docker container.
 
 Once deployed, register the app to your GitHub account or GitHub organization or it to work.
+
 ### Pre-requisite
 You have a computer with Linux installed
+
 You have a GitHub account for App registration
+
 Your computer has internet access
+
 Please also ensure you have the following installed:
 * docker
 * docker-compose
